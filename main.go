@@ -16,7 +16,7 @@ type processor interface {
 }
 
 var processors = map[string]processor{
-	"payload-limit": &payloadLimitRequestProcessor{},
+	"conv": &convRequestProcessor{},
 }
 
 func parseArgs(args []string) (port *int, opts *ep.ProcessingOptions, nonFlagArgs []string) {
@@ -36,7 +36,6 @@ func parseArgs(args []string) (port *int, opts *ep.ProcessingOptions, nonFlagArg
 }
 
 func main() {
-
 	// cmd subCmd arg, arg2,...
 	args := os.Args
 	if len(args) < 2 {
