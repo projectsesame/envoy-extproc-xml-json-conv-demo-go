@@ -2,24 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payload-limit-demo
-  namespace: payload-limit-demo
+  name: xml-json-conv-demo
+  namespace: xml-json-conv-demo
   annotations:
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: payload-limit-demo
+      app: xml-json-conv-demo
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: payload-limit-demo
+        app: xml-json-conv-demo
     spec:
       containers:
-        - name: payload-limit-demo-container
+        - name: xml-json-conv-demo-container
           image: >-
-            release.daocloud.io/skoala/envoy-extproc-payloadlimit-demo-go@sha256:dcc5ba7aa2790e87b0cd46799363367b54202585794ebfe87248264f111e63d8
+            release.daocloud.io/skoala/envoy-extproc-xml-json-conv-demo-go:v0.0.1
           ports:
             - containerPort: 50051
               protocol: TCP
@@ -44,8 +44,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: payload-limit-demo
-  namespace: payload-limit-demo
+  name: xml-json-conv-demo
+  namespace: xml-json-conv-demo
   annotations:
 spec:
   ports:
@@ -54,7 +54,7 @@ spec:
       targetPort: 50051
       nodePort: 31928
   selector:
-    app: payload-limit-demo
+    app: xml-json-conv-demo
   type: NodePort
   sessionAffinity: None
   externalTrafficPolicy: Cluster
