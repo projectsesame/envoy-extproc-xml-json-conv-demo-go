@@ -19,7 +19,7 @@ spec:
       containers:
         - name: xml-json-conv-demo-container
           image: >-
-            release.daocloud.io/skoala/envoy-extproc-payloadlimit-demo-go@sha256:dcc5ba7aa2790e87b0cd46799363367b54202585794ebfe87248264f111e63d8
+            release.daocloud.io/skoala/envoy-extproc-xml-json-conv-demo-go:v0.0.1
           ports:
             - containerPort: 50051
               protocol: TCP

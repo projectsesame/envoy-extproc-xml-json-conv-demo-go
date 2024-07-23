@@ -3,6 +3,7 @@ module github.com/projectsesame/envoy-extproc-xml-json-conv-demo-go
 go 1.21
 
 require (
+	github.com/clbanning/mxj/v2 v2.7.0
 	github.com/envoyproxy/go-control-plane v0.12.0
 	github.com/wrossmorrow/envoy-extproc-sdk-go v0.0.21
 )

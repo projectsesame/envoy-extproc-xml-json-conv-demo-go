@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"io"
 	"log"
 
+	mxj "github.com/clbanning/mxj/v2"
 	typev3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	ep "github.com/wrossmorrow/envoy-extproc-sdk-go"
 )
@@ -37,12 +40,21 @@ func detectFormat(data []byte) (string, error) {
 		return kJSON, nil
 	}
 
-	var xmlObj any
-	if err := xml.Unmarshal(data, &xmlObj); err == nil {
+	if isValidXML(data) {
 		return kXML, nil
 	}
 
 	return "", errors.New("unknown format")
+}
+
+func isValidXML(input []byte) bool {
+	decoder := xml.NewDecoder(bytes.NewReader(input))
+	for {
+		err := decoder.Decode(new(any))
+		if err != nil {
+			return err == io.EOF
+		}
+	}
 }
 
 func (s *convRequestProcessor) ProcessRequestBody(ctx *ep.RequestContext, body []byte) error {
@@ -98,22 +110,34 @@ func (s *convRequestProcessor) Init(opts *ep.ProcessingOptions, nonFlagArgs []st
 
 func (s *convRequestProcessor) Finish() {}
 
-// xmlToJSON converts XML data to JSON.
-func xmlToJSON(data []byte) ([]byte, error) {
-	var m map[string]any
-	err := xml.Unmarshal(data, &m)
+// jsonToXML converts a JSON byte array to XML byte array.
+func jsonToXML(data []byte) ([]byte, error) {
+	mxj.XMLEscapeChars(true)
+	m, err := mxj.NewMapJsonReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(m)
+
+	buf := &bytes.Buffer{}
+	err = m.XmlIndentWriter(buf, "", "\t")
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
-// jsonToXML converts JSON data to XML.
-func jsonToXML(data []byte) ([]byte, error) {
-	var m map[string]any
-	err := json.Unmarshal(data, &m)
+// xmlToJSON converts XML data to JSON.
+func xmlToJSON(data []byte) ([]byte, error) {
+	mxj.XMLEscapeChars(true)
+	m, err := mxj.NewMapXmlReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
-	return xml.Marshal(m)
+
+	buf := &bytes.Buffer{}
+	err = m.JsonIndentWriter(buf, "", "\t")
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
